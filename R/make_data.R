@@ -1,5 +1,4 @@
-library(mvtnorm)
-
+#' Simulate data
 #' @description takes a function and other data parameters and creates paired time resolved
 #'  data of two groups.
 #'  @param n number of individuals per group
