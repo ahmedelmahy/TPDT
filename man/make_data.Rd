@@ -2,6 +2,7 @@
 % Please edit documentation in R/make_data.R
 \name{make_data}
 \alias{make_data}
+\title{Simulate data}
 \usage{
 make_data(shift, n, sd1, sd2, ntimepoints, type = c("shift", "phaseshift",
   "slopeshift"), f, f2 = NULL)
