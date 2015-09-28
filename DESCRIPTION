@@ -6,8 +6,8 @@ Description: The package provides the necessary tools to compute a TPDT for a ge
 Depends: R (>= 3.2.2)
 License: GPL-3
 LazyData: true
-Author: Ivan Kondoversky <ivan.kondoversky@helmholtz-muenchen.de> [aut, cre]
-Maintainer: Tore Erdmann <tore.erdmann@gmail.com>
 Imports: RColorBrewer, parallel, fda, mvtnorm, sme, plyr, checkmate
 Suggests: testthat
+URL: http://github.com/erdto/TPDT
+BugReports: http://github.com/erdto/TPDT/issues
 Encoding: UTF-8
