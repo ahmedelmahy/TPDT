@@ -17,10 +17,10 @@ functional.difftest <- function(rawdata = NULL, funcdata = NULL, N = 10, Nsim, B
       y1 <- rawdata$y1
       y2 <- rawdata$y2
     }
-    basis  <- create.bspline.basis(range(time), 15)         ###############
-    Par <- fdPar(basis, 2, lambda = .1)                   ###############
-    func1 <- smooth.basis(time, y1, Par)$fd 
-    func2 <- smooth.basis(time, y2, Par)$fd
+    basis  <- fda::create.bspline.basis(range(time), 15)         ###############
+    Par <- fda::fdPar(basis, 2, lambda = .1)                   ###############
+    func1 <- fda::smooth.basis(time, y1, Par)$fd 
+    func2 <- fda::smooth.basis(time, y2, Par)$fd
     group1 <- rfunc(N, func1, sigma = sigma)
     group2 <- rfunc(N, func2, sigma = sigma)
   }
@@ -31,13 +31,13 @@ functional.difftest <- function(rawdata = NULL, funcdata = NULL, N = 10, Nsim, B
   }
   
   if(deriv > 0){
-    group1 <- deriv.fd(group1, deriv)
-    group2 <- deriv.fd(group2, deriv)
+    group1 <- fda::deriv.fd(group1, deriv)
+    group2 <- fda::deriv.fd(group2, deriv)
   }
   
   # compute functional differnces and mean
   dif <- group1 - group2
-  mdif <- mean.fd(dif)
+  mdif <- fda::mean.fd(dif)
   
   # compute statistic u and contained variability 
   u0 <- compute.u(dif = dif, basis = basis, dependent = dependent)
@@ -59,15 +59,7 @@ functional.difftest <- function(rawdata = NULL, funcdata = NULL, N = 10, Nsim, B
   
   # if more than one core, avoid overhead by using ncores threads
   # with the same number of repetitions to do in parallel
-  if(ncores > 1) {
-    inds <- split(1:B, 1:ncores)  
-    resample.u <- mclapply(inds, function(b_vector) {
-      sapply(b_vector, mcfunc)
-    }, mc.cores = ncores)
-  } else {
-    resample.u <- mclapply(1:B, mcfunc, mc.cores = ncores)
-  }
-  
+  resample.u <- parallel::mclapply(1:B, mcfunc, mc.cores = ncores, mc.preschedule = TRUE)
   resample.u <- sapply(resample.u, c)
   
   # compute raw p-value

@@ -65,21 +65,19 @@ cv3 <- function(y, timemat, rangevals, nbas = NULL, with.na = FALSE, trace = FAL
         # first and last observation are never left out.
         n <- length(y) - 2*nrow(y)
         
-        bas <- create.bspline.basis(rangeval = rangevals, nbas = nbas)      
-        #     cv <- matrix(0, ncol = ncol(y), nrow = length(2:(nrow(y)-1)))
-        c <- 1
+        bas <- fda::create.bspline.basis(rangeval = rangevals, nbas = nbas)      
         
         # parallel version:
-        cv <- unlist(mclapply(2:(nrow(y)-1), function(i) {
-          # for(i in inds) {
-            Par <- fdPar(bas, 2, lambda = lambda)
+        cv <- unlist(parallel::mclapply(2:(nrow(y)-1), function(i) {
+          
+            Par <- fda::fdPar(bas, 2, lambda = lambda)
             
             # fit for all individuals at once (but seperately)
             sm <- smooth.basis.na(argvals = timemat[-i, , drop = FALSE], y = y[-i , ], Par)
             
             # return one row with errors
               drop(
-                eval.fd(sm, evalarg = timemat[i, , drop = FALSE])
+                fda::eval.fd(sm, evalarg = timemat[i, , drop = FALSE])
               ) - y[i, ]
         }
         , mc.cores = ncpus, mc.preschedule = TRUE))
@@ -97,19 +95,19 @@ cv3 <- function(y, timemat, rangevals, nbas = NULL, with.na = FALSE, trace = FAL
       # first and last observation are never left out.
       n <- length(y) - 2*nrow(y)
       
-      bas <- create.bspline.basis(rangeval = rangevals, nbas = nbas)      
+      bas <- fda::create.bspline.basis(rangeval = rangevals, nbas = nbas)      
       #     cv <- matrix(0, ncol = ncol(y), nrow = length(2:(nrow(y)-1)))
         
       # parallel version:
-      cv <- unlist(mclapply(2:(nrow(y)-1), function(i) {
-          Par <- fdPar(bas, 2, lambda = lambda)
+      cv <- unlist(parallel::mclapply(2:(nrow(y)-1), function(i) {
+          Par <- fda::fdPar(bas, 2, lambda = lambda)
           
           # fit for all individuals at once (but seperately)
-          sm <- smooth.basis(argvals = timemat[-i, , drop = FALSE], y = y[-i , ], Par)
+          sm <- fda::smooth.basis(argvals = timemat[-i, , drop = FALSE], y = y[-i , ], Par)
           
           # fill one row with errors
             drop(
-              eval.fd(sm$fd, evalarg = timemat[i, , drop = FALSE])
+              fda::eval.fd(sm$fd, evalarg = timemat[i, , drop = FALSE])
             ) - y[i, ]
           
       }, mc.cores = ncpus, mc.preschedule = TRUE))

@@ -41,7 +41,7 @@ prep_data <- function(df, nbas, lambda, deriv, cv2 = FALSE) {
   
   # make basis
   if(is.null(nbas)) nbas <- max(8, round(.3 * length(ntp)))
-  basis <- create.bspline.basis(rangeval = range(df[,"time"]), nbasis = nbas)
+  basis <- fda::create.bspline.basis(rangeval = range(df[,"time"]), nbasis = nbas)
   
   
   # find lambda
@@ -54,7 +54,7 @@ prep_data <- function(df, nbas, lambda, deriv, cv2 = FALSE) {
                   nbas = nbas, with.na = any(is.na(datmat)))
   }
   
-  Par <- fdPar(fdobj = basis, Lfdobj =  2, lambda = lambda)
+  Par <- fda::fdPar(fdobj = basis, Lfdobj =  2, lambda = lambda)
   
   # get coefficients of smoothed functions for each group 
   sm1 <- smooth.basis.na(argvals = matrix(unlist(timel1), byrow = FALSE, nrow = ntp),

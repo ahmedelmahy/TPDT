@@ -5,9 +5,17 @@
 \name{TPDT}
 \alias{TPDT}
 \alias{TPDT-package}
+\alias{TPDT.data.frame}
+\alias{TPDT.numeric}
 \title{TPDT}
 \usage{
 TPDT(x, ...)
+
+\method{TPDT}{numeric}(data, group, time, id, deriv = 0, B = 100,
+  lambda = NULL, ncores = 1, ...)
+
+\method{TPDT}{data.frame}(data, deriv = 0, B = 100, lambda = NULL,
+  ncores = 1, nbas = NULL, cv2 = FALSE, ...)
 }
 \arguments{
 \item{data}{either a [data.frame] with columns named "data", "group", "time" and "id" analogously to
@@ -38,4 +46,10 @@ validation function are presented to the user.
 Time Resolved paired differences test (TPDT)
 Main function to perform a TPDT for a given dataset.
 }
+\section{Methods (by class)}{
+\itemize{
+\item \code{numeric}: 
+
+\item \code{data.frame}: 
+}}
 
