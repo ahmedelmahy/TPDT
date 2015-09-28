@@ -1,17 +1,25 @@
-
-library(sme)
-library(parallel)
-library(plyr)
-
-# hypothese mean(grp1) = mean(grp2)
-
-#' Functional t-test for mean curves from two spline mixed effects ('sme') models
+#' Functional t-test for mean curves from two spline mixed effects (\code{sme}) models
+#' @description Adapted from Berk, M. (2010).
 #' @param data [vector] with the response variable, i.e. values of some blood marker
 #' @param group [vector] with grouping information. Has to be same length as data and 
 #' contain two groups.
 #' @param timepoints [vector] with timepoints of measurments of the values in data
 #' @param id [vector] with index for individuals
-#' @return pvalue for group differences
+#' @param nboot [numeric] Number of bootstrap iterations. 
+#' @param points [numeric] resolution of grid when discretisizing.
+#' @param NAs [logical vector] indicator vector corresponding  to the rows of data for NA observations.
+#' @param method [choice] Currently only "non-parametric"-Version of the test available.
+#' @param ncpus [Integer] number of cores to use in parallel for bootstrap.
+#' @return List with components: \itemize{
+#' \item p: pvalue for group differences
+#' 
+#' \item fit1: sme-fit object for group 1
+#' 
+#' \item fit2: sme-fit object for group 2
+#' 
+#' }
+#' @example demo/ex_ttest_berk.R
+#' @export
 #' 
 ttest_berk <- function(data, group, timepoints, id, points = 500, prob = 0, NAs = 0,
                        nboot = 1000, method = c("non-parametric", "parametric"), ncpus = 1, ...) {

@@ -1,8 +1,17 @@
 library(mvtnorm)
 
-# takes a function and other parameters
-# returns simulated data, with certain shift, variance, and if
-# paired = TRUE also paired data with certain correlation
+#' @description takes a function and other data parameters and creates paired time resolved
+#'  data of two groups.
+#'  @param n number of individuals per group
+#'  @param sd1 In group variance of group one.
+#'  @param sd2 Variance of the "shift", that the second group is shifted away (pairwise) from group 1.
+#'  @param ntimepoints Number of time measurements per individuals
+#'  @param type The type of shift: vertical ("shift"), horizontal ("phaseshift"), or slope ("slopeshift")
+#'  @param f The underlying function of group 1. If not provided, there are default functions involving sin().
+#'  @param f2 deprecated.
+#' @return [data.frame] with simulated data, with certain shift, variances, number of time points etc. 
+#' The id column holdes the pairing information.
+#' @export
 make_data <- function(shift, n, sd1, sd2, ntimepoints, type = c("shift", "phaseshift", "slopeshift"), 
                       f, f2 = NULL) {
   

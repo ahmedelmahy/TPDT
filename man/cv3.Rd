@@ -17,13 +17,13 @@ over time.}
 
 \item{nbas}{[scalar] number of basis function to use.}
 
+\item{with.na}{[logical] Are there missing values?}
+
 \item{trace}{[logical] Should the optimization process be traced?}
 
 \item{seed}{[scalar] Set seed to get reproducible results.}
 
 \item{ncpus}{[scalar] Number of CPUs to use. Should only be used for large numbers of individuals.}
-
-\item{check.na}{TODO}
 }
 \value{
 [scalar] The optimal smoothing parameter.

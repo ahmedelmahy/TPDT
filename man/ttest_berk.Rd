@@ -2,7 +2,7 @@
 % Please edit documentation in R/ttest_berk.R
 \name{ttest_berk}
 \alias{ttest_berk}
-\title{Functional t-test for mean curves from two spline mixed effects ('sme') models}
+\title{Functional t-test for mean curves from two spline mixed effects (\code{sme}) models}
 \usage{
 ttest_berk(data, group, timepoints, id, points = 500, prob = 0, NAs = 0,
   nboot = 1000, method = c("non-parametric", "parametric"), ncpus = 1,
@@ -17,11 +17,38 @@ contain two groups.}
 \item{timepoints}{[vector] with timepoints of measurments of the values in data}
 
 \item{id}{[vector] with index for individuals}
+
+\item{points}{[numeric] resolution of grid when discretisizing.}
+
+\item{NAs}{[logical vector] indicator vector corresponding  to the rows of data for NA observations.}
+
+\item{nboot}{[numeric] Number of bootstrap iterations.}
+
+\item{method}{[choice] Currently only "non-parametric"-Version of the test available.}
+
+\item{ncpus}{[Integer] number of cores to use in parallel for bootstrap.}
 }
 \value{
-pvalue for group differences
+List with components: \itemize{
+\item p: pvalue for group differences
+
+\item fit1: sme-fit object for group 1
+
+\item fit2: sme-fit object for group 2
+
+}
 }
 \description{
-Functional t-test for mean curves from two spline mixed effects ('sme') models
+Adapted from Berk, M. (2010).
+}
+\examples{
+# define underlying function
+f <- function(x) 2 * x * sin(x) + 10
+# simulate paired data from two groups with underlying function f
+simdata <- make_data(f = f, shift = 5, n = 5, sd1 = .5, sd2 = .5,
+                     ntimepoints = 10, type = "shift")
+# run test
+res <-  ttest_berk(data = simdata$data, group = simdata$group, timepoints = simdata$time, 
+                   id = simdata$id, method = "non-parametric", nboot = 1000)
 }
 

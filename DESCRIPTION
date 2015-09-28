@@ -1,13 +1,13 @@
 Package: TPDT
 Title: Test for paired time-resolved differences.
 Version: 0.0.0.9000
-Authors@R: person(given = "Tore", family = "Erdmann", email = "tore.erdmann@@gmail.com", role = c("aut", "cre"))
+Authors@R: Ivan Kondoversky <ivan.kondoversky@@helmholtz-muenchen.de> [aut], Tore Erdmann <tore.erdmann@@helmholtz-muenchen.de> [cre]
 Description: The package provides the necessary tools to compute a TPDT for a general dataset. The data required are paired, time-resloved observations. The output of the statistical test allows to decide whether there are significant differences between both groups and to quantify the impact of those differences. The package is extended by generic functions which may be applied on the computed test object and help visualize the test results. Additionally a function which allows to sample random curves around a given smooth curve and a cross validation function are presented to the user.
-Depends: R (>= 3.2.1)
-License: CC0
+Depends: R (>= 3.2.2)
+License: GPL-3
 LazyData: true
-Author: Tore Erdmann <tore.erdmann@gmail.com> [aut, cre]
+Author: Ivan Kondoversky <ivan.kondoversky@helmholtz-muenchen.de> [aut, cre]
 Maintainer: Tore Erdmann <tore.erdmann@gmail.com>
-Imports: RColorBrewer, parallel, fda, checkmate, sme
+Imports: RColorBrewer, parallel, fda, mvtnorm, sme, plyr, checkmate
 Suggests: testthat
 Encoding: UTF-8

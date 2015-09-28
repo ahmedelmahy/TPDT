@@ -1,6 +1,30 @@
-library(fda)
-library(mvtnorm)
-
+#' Test for group difference in functional data.
+#' @description Uses joint confidance bands for the difference curves of two groups.  
+#' Adapted from Crainiceanu, C. (2012).
+#' @param data [vector] with the response variable, i.e. values of some blood marker
+#' @param group [vector] with grouping information. Has to be same length as data and 
+#' contain two groups.
+#' @param timepoints [vector] with timepoints of measurments of the values in data
+#' @param id [vector] with index for individuals
+#' @param points [numeric] resolution of grid when discretisizing.
+#' @param lambda [numeric] provide smoothing parameter. If NULL, an optimal choice is computed
+#'  through cross-validation.
+#' @param nboot [numeric] Number of bootstrap iterations. 
+#' @param method [choice] Currently only "non-parametric"-Version of the test available.
+#' @param ncpus [Integer] number of cores to use in parallel for bootstrap.
+#' @return List with components: \itemize{
+#' \item p: pvalue for group differences
+#' 
+#' \item fit1: fda object for group 1
+#' 
+#' \item fit2: fda object for group 2
+#' 
+#' \item lambda: smoothing parameter used for fitting.
+#' 
+#' }
+#' 
+#' @example demo/ex_ttest_crain.R
+#' @export
 ttest_crain <- function(data, group, timepoints, id, 
                              method = c("spline", "coef", "rawdata"), 
                         points = 201, nboot = 1000, ncpus = 1, lambda = NULL) {

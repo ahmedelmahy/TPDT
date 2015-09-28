@@ -7,7 +7,7 @@
 #' @param timemat [Matrix] of timepoints with one column per individual. Should be corresponding to the y matrix.
 #' @param rangevals [vector] with first and last time points.
 #' @param nbas [scalar] number of basis function to use.
-#' @param check.na TODO
+#' @param with.na [logical] Are there missing values?
 #' @param trace [logical] Should the optimization process be traced?
 #' @param seed [scalar] Set seed to get reproducible results.
 #' @param ncpus [scalar] Number of CPUs to use. Should only be used for large numbers of individuals.
@@ -49,7 +49,7 @@
 #' @return
 #' [scalar] The optimal smoothing parameter.
 
-cv3 <- function(y, timemat, rangevals, nbas = NULL, with.na = FALSE, trace = F, seed, ncpus = 1) {
+cv3 <- function(y, timemat, rangevals, nbas = NULL, with.na = FALSE, trace = FALSE, seed, ncpus = 1) {
   stopifnot(ncpus >= 1)
   
   fun_opt <- 
@@ -69,35 +69,25 @@ cv3 <- function(y, timemat, rangevals, nbas = NULL, with.na = FALSE, trace = F, 
         #     cv <- matrix(0, ncol = ncol(y), nrow = length(2:(nrow(y)-1)))
         c <- 1
         
-        splitind <- split(2:(nrow(y)-1), 1:ncpus)
         # parallel version:
-        cv <- unlist(mclapply(splitind, function(inds) 
-        {
-          err <- matrix(0, ncol = ncol(y), nrow = length(2:(nrow(y)-1)))
-          c <- 1
-          for(i in inds) {
+        cv <- unlist(mclapply(2:(nrow(y)-1), function(i) {
+          # for(i in inds) {
             Par <- fdPar(bas, 2, lambda = lambda)
             
             # fit for all individuals at once (but seperately)
             sm <- smooth.basis.na(argvals = timemat[-i, , drop = FALSE], y = y[-i , ], Par)
             
-            # fill one row with errors
-            err[c, ] <- 
+            # return one row with errors
               drop(
                 eval.fd(sm, evalarg = timemat[i, , drop = FALSE])
               ) - y[i, ]
-            c <- c + 1
-          }
-          err
         }
-        , mc.cores = ncpus))
+        , mc.cores = ncpus, mc.preschedule = TRUE))
         
         if(trace) cat(": ", sum(abs(cv), na.rm = TRUE), "\n")
         sum(abs(cv), na.rm = TRUE)    
       }
-    }
-  else 
-  {
+    } else {
     function(lambda, y, timemat, rangevals, nbas, ncpus) {
       
       
@@ -109,30 +99,20 @@ cv3 <- function(y, timemat, rangevals, nbas = NULL, with.na = FALSE, trace = F, 
       
       bas <- create.bspline.basis(rangeval = rangevals, nbas = nbas)      
       #     cv <- matrix(0, ncol = ncol(y), nrow = length(2:(nrow(y)-1)))
-      c <- 1
-      
-      splitind <- split(2:(nrow(y)-1), 1:ncpus)
+        
       # parallel version:
-      cv <- unlist(mclapply(splitind, function(inds) 
-      {
-        err <- matrix(0, ncol = ncol(y), nrow = length(2:(nrow(y)-1)))
-        c <- 1
-        for(i in inds) {
+      cv <- unlist(mclapply(2:(nrow(y)-1), function(i) {
           Par <- fdPar(bas, 2, lambda = lambda)
           
           # fit for all individuals at once (but seperately)
           sm <- smooth.basis(argvals = timemat[-i, , drop = FALSE], y = y[-i , ], Par)
           
           # fill one row with errors
-          err[c, ] <- 
             drop(
               eval.fd(sm$fd, evalarg = timemat[i, , drop = FALSE])
             ) - y[i, ]
-          c <- c + 1
-        }
-        err
-      }
-      , mc.cores = ncpus))
+          
+      }, mc.cores = ncpus, mc.preschedule = TRUE))
       
       if(trace) cat(": ", sum(abs(cv), na.rm = TRUE)  , "\n")
       sum(abs(cv), na.rm = TRUE)    
@@ -144,7 +124,7 @@ cv3 <- function(y, timemat, rangevals, nbas = NULL, with.na = FALSE, trace = F, 
   #                method = 'Brent', lower = -20, upper = 20)
   opt <- optimize(f = fun_opt, y = y, timemat = timemat, tol = 1e-1,
                   rangevals = rangevals, nbas = nbas, ncpus = ncpus, lower = -20, upper = 20)
-#   if(opt$convergence == 1)
-#     warning("Optimize reached maxiter.")
+  #   if(opt$convergence == 1)
+  #     warning("Optimize reached maxiter.")
   return(exp(opt$minimum))
 }
