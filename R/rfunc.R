@@ -2,7 +2,7 @@
 
 # Function to simulate smooth curves based on functional object
 rfunc <- function(N = 1, func = NULL, sigma = 1) {
-  if(!is.fd(func)) stop("no functional object supplied")
+  if(!fda::is.fd(func)) stop("no functional object supplied")
   ret <- func
   ret$coefs <- matrix(NA, ncol = N, nrow = length(func$coef))
   if(length(sigma) == 1) {
@@ -12,7 +12,7 @@ rfunc <- function(N = 1, func = NULL, sigma = 1) {
   }
   else {
     ret$coef <- matrix(func$coef, ncol = N, nrow = length(func$coef)) + 
-      t(rmvnorm(N, rep(0, length(func$coef)), sigma = sigma, method = "svd"))
+      t(mvtnorm::rmvnorm(N, rep(0, length(func$coef)), sigma = sigma, method = "svd"))
     
 #     for(i in 1:N){ # geht auch ohne for schleife, sondern mit matrix spaeter
 #       ret$coefs[, i] <- t(func$coefs) + rmvnorm(1, rep(0, length(func$coefs)), sigma = sigma, method = "svd")

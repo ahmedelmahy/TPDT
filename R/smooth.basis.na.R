@@ -13,20 +13,20 @@ smooth.basis.na <- function(argvals, y, fdParobj, ...) {
      y.na <- !is.na(y)
      y.new <- y[y.na]
      argvals.new <- argvals[!is.na(y)]
-     temp <- smooth.basis(argvals.new,y.new, fdParobj)
+     temp <- fda::smooth.basis(argvals.new,y.new, fdParobj)
      coefs <- temp$fd$coefs
      basis <- temp$fd$basis
    }
   else 
   {
-    temp <- smooth.basis(argvals, y, fdParobj)
+    temp <- fda::smooth.basis(argvals, y, fdParobj)
     na.col <- unique(which(is.na(temp$fd$coefs),arr.ind=TRUE)[,2])
     for(col in na.col) 
     {
       y.na <- !is.na(y[,col])
       y.new <- y[y.na, col]
       argvals.new <- argvals[y.na, col]
-      temp$fd$coefs[,col] <- smooth.basis(argvals.new,y.new,fdParobj)$fd$coefs
+      temp$fd$coefs[,col] <- fda::smooth.basis(argvals.new,y.new,fdParobj)$fd$coefs
     }
     coefs <- temp$fd$coefs
     basis <- temp$fd$basis
