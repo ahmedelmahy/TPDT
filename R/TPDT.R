@@ -12,7 +12,7 @@
 #' @export
 TPDT <- function(x, ...) UseMethod("TPDT")
 
-#' @describeIn TPDT
+#' @inheritParams TPDT
 #' @export
 TPDT.numeric <- function(data, group, time, id, deriv = 0, B = 100, lambda = NULL, ncores = 1, ...){
 
@@ -22,7 +22,7 @@ TPDT.numeric <- function(data, group, time, id, deriv = 0, B = 100, lambda = NUL
   TPDT.data.frame(data = datframe, deriv = deriv, B = B, lambda = lambda, ncores = ncores, ...)
 }
 
-#' @describeIn TPDT
+#' @inheritParams TPDT
 #' @export
 TPDT.data.frame <- function(data, deriv = 0, B = 100, lambda = NULL, ncores = 1, nbas = NULL, cv2 = FALSE, ...) {
   # TODO:
