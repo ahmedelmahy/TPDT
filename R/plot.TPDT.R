@@ -43,7 +43,15 @@
 plot.TPDT <- function(x, y, plottype, ...){
   
   if(missing(plottype)) plottype <- 1
-  if(plottype == 1){
+  if(plottype == 1) {
+    # hier noch ändern!!!
+    matplot(y = matrix(x$data, nrow = 10), matrix(simdata$time, nrow = 10), 
+            main = paste("pvalue = ", result$p), ylab = "y", xlab = "time", type = "b", lwd = 3)
+    plot(result$funcdata$func1, add = TRUE, lwd = 2)
+    plot(result$funcdata$func2, add = TRUE, lwd = 2, col = c(3, 4))
+    
+  }
+  if(plottype == 2) {
     hist.TPDT <- function(tpdt, breaks, xlim, main, xlab, ...){
       
       # some defaults
@@ -65,7 +73,7 @@ plot.TPDT <- function(x, y, plottype, ...){
     hist.TPDT(x$test, ...)
   }
   
-  if(plottype == 2){
+  if(plottype == 3){
     
     box.TPDT <- function(tpdt, main, xlab, ...){
       
@@ -86,7 +94,7 @@ plot.TPDT <- function(x, y, plottype, ...){
     box.TPDT(x$test, ...)
   }
   
-  if(plottype == 3){
+  if(plottype == 4){
     concept.TPDT <- function(tpdt){
       # concept figure
       # creates plot on 4 different rows showing the mechanism of TPDT
