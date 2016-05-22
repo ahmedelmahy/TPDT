@@ -1,4 +1,5 @@
 #' @export
+#' @import fda
 
 # Main function for TPDT
 
@@ -59,8 +60,17 @@ functional.difftest <- function(rawdata = NULL, funcdata = NULL, N = 10, Nsim, B
   
   # if more than one core, avoid overhead by using ncores threads
   # with the same number of repetitions to do in parallel
-  resample.u <- parallel::mclapply(1:B, mcfunc, mc.cores = ncores, mc.preschedule = TRUE)
-  resample.u <- sapply(resample.u, c)
+#   if(ncores > 1) {
+#     inds <- split(1:B, 1:ncores)  
+#     resample.u <- unlist(parallel::mclapply(inds, function(b_vector) {
+#       sapply(b_vector, mcfunc)
+#     }, mc.cores = ncores))
+#   } else {
+  resample.u <- unlist(parallel::mclapply(1:B, mcfunc, mc.cores = ncores, 
+                                          mc.preschedule = TRUE))
+  # }
+  
+  # resample.u <- sapply(resample.u, c)
   
   # compute raw p-value
   pval <- mean(u0 < resample.u)

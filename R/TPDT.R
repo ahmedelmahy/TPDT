@@ -1,4 +1,5 @@
 #' Time Resolved paired differences test (TPDT)
+#' 
 #' Main function to perform a TPDT for a given dataset.
 #' @param data either a [data.frame] with columns named "data", "group", "time" and "id" analogously to 
 #' the use of \code{TPDT.numeric}. If using \code{TPDT.numeric}, a vector with same order as group, time and id vector.
@@ -10,8 +11,12 @@
 #' @param lambda [numeric] Smoothing parameter to use, if known in advance. If NULL, it is computed by cross validation.
 #' @param ncores [integer] Number of CPUs to use for parallization.
 #' @export
+#' @example demo/example.R
+#' @import checkmate
 TPDT <- function(x, ...) UseMethod("TPDT")
 
+
+#' @describeIn TPDT Method for column wise input
 #' @inheritParams TPDT
 #' @export
 TPDT.numeric <- function(data, group, time, id, deriv = 0, B = 100, lambda = NULL, ncores = 1, ...){
@@ -22,9 +27,10 @@ TPDT.numeric <- function(data, group, time, id, deriv = 0, B = 100, lambda = NUL
   TPDT.data.frame(data = datframe, deriv = deriv, B = B, lambda = lambda, ncores = ncores, ...)
 }
 
+#' @describeIn TPDT Method for data.frame input
 #' @inheritParams TPDT
 #' @export
-TPDT.data.frame <- function(data, deriv = 0, B = 100, lambda = NULL, ncores = 1, nbas = NULL, cv2 = FALSE, ...) {
+TPDT.data.frame <- function(data, deriv = 0, B = 100, lambda = NULL, ncores = 1, nbas = NULL, ...) {
   # TODO:
   # convert character to factor/numeric
   stopifnot(all(names(data) %in% c("data", "group", "time", "id")))
@@ -33,7 +39,6 @@ TPDT.data.frame <- function(data, deriv = 0, B = 100, lambda = NULL, ncores = 1,
   checkmate::assertIntegerish(x = deriv)
   checkmate::assertIntegerish(x = ncores)
   checkmate::assertIntegerish(x = B)
-  checkmate::assertLogical(cv2)
   checkmate::assertDataFrame(data, types = "numeric", min.rows = 8, min.cols = 4, 
                              all.missing = FALSE, col.names = "named")  
   
@@ -44,8 +49,7 @@ TPDT.data.frame <- function(data, deriv = 0, B = 100, lambda = NULL, ncores = 1,
   
   
   # make functional data from the raw data, find lamba if not provided etc.
-  comptime1 <- system.time(funcdata <- prep_data(data, nbas = nbas, lambda = lambda, deriv = deriv,
-                                                 cv2 = cv2))
+  comptime1 <- system.time(funcdata <- prep_data(data, nbas = nbas, lambda = lambda, deriv = deriv))
   #   funcdata <- list(func1 = funcdata$func1, func2 = funcdata$func2, 
   #                    basis = funcdata$func1$basis)
   

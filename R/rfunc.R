@@ -1,4 +1,6 @@
 #' @export
+#' @import fda
+#' @importFrom mvtnorm rmvnorm
 
 # Function to simulate smooth curves based on functional object
 rfunc <- function(N = 1, func = NULL, sigma = 1) {

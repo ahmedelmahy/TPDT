@@ -5,11 +5,10 @@
 #' @param df [data.frame] with columns "data", "time", "group" and "id".
 #' @param nbas [integer] number of basis functions to use.
 #' @param deriv [integer] number of derivative to analyse.
-#' @param cv2 [logcial] should old cross validation function be used? Only for testing purposes!
 #' @return [list] With components "func1" and "func2" corresponding to the functional data for the
 #' to groups to be compared. Both objects are of class "fd".
 #' 
-prep_data <- function(df, nbas, lambda, deriv, cv2 = FALSE) {
+prep_data <- function(df, nbas, lambda, deriv) {
   
   # input check
   if(length(unique(df$id)) < 2) stop("Less than two subjects per group.")
@@ -49,7 +48,7 @@ prep_data <- function(df, nbas, lambda, deriv, cv2 = FALSE) {
   
   if(is.na(lambda))
   {
-    # compute lambda with LOA-CV
+    # compute lambda with LOO-CV
     lambda <- cv3(y = datmat, timemat = timemat, rangevals = range(df$time),
                   nbas = nbas, with.na = any(is.na(datmat)))
   }

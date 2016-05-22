@@ -1,39 +1,5 @@
-#' Plot the outcome of a TPDT object
-#' 
-#' @description Plot an object of class \code{TPDT}. The function allows the user to select a plot type and thus providing the flexibility to choose which aspect of data to be graphically presented.
-#' @param x object of class \code{TPDT}
-#' @param y not used
-#' @param plottype type of plot to be produced
-#' @param ... further arguments to be passed to the chosen plot function
-#' @details \code{plottype==1} (default) produces a histogram of the resampled test statistics and 
-#' displays the corresponding p-value of the test in the upper right of the plot window.
-#' 
-#' \code{plottype==2} presents the resampled test statistics as a horizontal boxplot and 
-#' again the p-value is displayed.
-#' 
-#' \code{plottype==3} presents the data, single steps of the computation workflow (difference 
-#' curves, mean of difference curves and standard deviation of difference curves) and  histogram 
-#' of resampled test statistics as well as the p-value and information about the rejection of the null 
-#' hypothesis.
-#' \code{plottype==3} might be difficult for a large number of observations.
-#' 
-#' @examples
-#' f <- function(x) 2 * x * sin(x) + 10
-#' # simulate paired data from two groups with underlying function f
-#' simdata <- make_data(f = f, shift = 5, n = 5, sd1 = .5, sd2 = .5, 
-#' ntimepoints = 10, type = "shift")
-#' 
-#' # run test
-#' res <- TPDT(simdata, B = 100)
-#' 
-#' # call plot on result of the test
-#' plot(res, plottype = 1)
-#' plot(res, plottype = 2)
-#' plot(res, plottype = 3)
-#' @author Ivan Kondofersky
-#' @references To be added after acceptance of publication.
-#' @seealso \code{\link{TPDT}}, \code{\link{summary.TPDT}}, \code{\link{print.TPDT}}
 #' @export
+#' @import fda
 
 # plot function for TPDT objects
 # three types of plots possible at the moment, controlled via plottype argument
@@ -43,15 +9,7 @@
 plot.TPDT <- function(x, y, plottype, ...){
   
   if(missing(plottype)) plottype <- 1
-  if(plottype == 1) {
-    # hier noch ändern!!!
-    matplot(y = matrix(x$data, nrow = 10), matrix(simdata$time, nrow = 10), 
-            main = paste("pvalue = ", result$p), ylab = "y", xlab = "time", type = "b", lwd = 3)
-    plot(result$funcdata$func1, add = TRUE, lwd = 2)
-    plot(result$funcdata$func2, add = TRUE, lwd = 2, col = c(3, 4))
-    
-  }
-  if(plottype == 2) {
+  if(plottype == 1){
     hist.TPDT <- function(tpdt, breaks, xlim, main, xlab, ...){
       
       # some defaults
@@ -73,7 +31,7 @@ plot.TPDT <- function(x, y, plottype, ...){
     hist.TPDT(x$test, ...)
   }
   
-  if(plottype == 3){
+  if(plottype == 2){
     
     box.TPDT <- function(tpdt, main, xlab, ...){
       
@@ -94,7 +52,7 @@ plot.TPDT <- function(x, y, plottype, ...){
     box.TPDT(x$test, ...)
   }
   
-  if(plottype == 4){
+  if(plottype == 3){
     concept.TPDT <- function(tpdt){
       # concept figure
       # creates plot on 4 different rows showing the mechanism of TPDT
@@ -115,7 +73,6 @@ plot.TPDT <- function(x, y, plottype, ...){
       
       # fix plot layout
       def.par <- par(no.readonly = TRUE) # save default, for resetting...
-      on.exit(par(def.par))
       layout(mat = matrix(c(1, 2, 3, 3, 4, 5, 6, 7), 4, 2, byrow = T))
       mycol <- c("blue", "red", "darkgreen")
       
@@ -127,8 +84,8 @@ plot.TPDT <- function(x, y, plottype, ...){
       abline(h = 0, lty = 2)
       
       # get splines from tpdt object
-      smgr1 <-tpdt$funcdata$func1
-      smgr2 <-tpdt$funcdata$func2
+      smgr1 <-tpdt$func$func1
+      smgr2 <-tpdt$func$func2
       # plot splines
       ylim <- c(0,max(tpdt$func$func1$coefs,tpdt$func$func2$coefs))
       plot(smgr1, col = mycol[1],ylim=ylim ,xlab = "", ylab = "", xaxt = "n", yaxt = "n",
@@ -163,14 +120,14 @@ plot.TPDT <- function(x, y, plottype, ...){
       }
       
       
-      plot(diff, col = mycol[3], ylim = ylim, xlab = "", ylab = "", xaxt = "n",  yaxt = "n",
+      plot(diff, col = mycol[3], ylim=ylim,xlab = "", ylab = "", xaxt = "n",  yaxt = "n",
            main = "difference curves")
       abline(h = 0, lty = 2)
       
       # plot mean of difference curves
-      mean.diff <- mean.fd(diff)
+      mean.diff <- fda::mean.fd(diff)
       # make sure the line x=0 is in the plot
-      if(sign(max(mean.diff$coefs))!=sign(min(mean.diff$coefs))) {
+      if(sign(max(mean.diff$coefs))!=sign(min(mean.diff$coefs))){
         ylim <- c(min(mean.diff$coefs),max(mean.diff$coefs))
       }else{
         if(max(mean.diff$coefs)<0){
@@ -185,13 +142,13 @@ plot.TPDT <- function(x, y, plottype, ...){
            main = "mean of difference curves")
       t <- seq(time[1], time[length(time)], length.out = 101)
       polygon(c(t, rev(t)), 
-              c(eval.fd(t, mean.diff), 
+              c(fda::eval.fd(t, mean.diff), 
                 rep(0, length(t))), 
               col = "#00009920", border = NA)
       abline(h = 0, lty = 2)
       
       # plot functional sd of difference curves
-      plot(sd.fd(diff), ylim = c(0,max(sd.fd(diff)$coefs)), col = mycol[3], xlab = "", ylab = "", xaxt = "n", yaxt = "n",
+      plot(fda::sd.fd(diff), ylim = c(0,max(sd.fd(diff)$coefs)), col = mycol[3], xlab = "", ylab = "", xaxt = "n", yaxt = "n",
            main = "sd of difference curves")
       polygon(c(t, rev(t)), 
               c(eval.fd(t, sd.fd(diff)), 
@@ -200,11 +157,11 @@ plot.TPDT <- function(x, y, plottype, ...){
       abline(h = 0, lty = 2)
       
       # plot histogram as representation of bootstrap test statistic distribution
-      hist(tpdt$test$resam, breaks = .1*length(tpdt$test$resam), xlim = c(0, tpdt$test$stat*1.2), #max(tpdt$test$resam)
+      hist(tpdt$test$resam, breaks = .1*length(tpdt$test$resam), xlim = c(0, max(tpdt$test$resam)*1.2),
            main = "test statistic distribution", xaxt = "n", yaxt = "n", xlab = "", ylab = "")
       abline(v = tpdt$test$stat, col = 2, lty = 2, lwd = 2)
       box(bty="o")
-      # axis(1)
+      
       
       # plot result summary 
       plot(1, ylim = c(0, 20), col = mycol[3], xlab = "", ylab = "", xaxt = "n", yaxt = "n", t= "n",

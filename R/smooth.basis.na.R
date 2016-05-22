@@ -2,8 +2,7 @@
 #' 
 #' Only for internal use in TPDT.
 #' See smooth.basis for argument descriptions.
-#' 
-#' 
+#' @import fda
 smooth.basis.na <- function(argvals, y, fdParobj, ...) {
   
   n <- NCOL(y)

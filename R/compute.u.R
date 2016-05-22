@@ -1,5 +1,5 @@
 # Function to compute the test statistic u
-
+#' @import fda
 compute.u <- function(group1 = NULL, group2 = NULL, dif = NULL, basis, dependent = F){
   if(is.null(dif)){
     if(any(c(is.null(group1), is.null(group2)))) stop("something's wrong")
@@ -8,7 +8,7 @@ compute.u <- function(group1 = NULL, group2 = NULL, dif = NULL, basis, dependent
   }
   stopifnot(ncol(dif$coef) > 0)
   
-  if(fda::is.fd(dif))
+  if(is.fd(dif))
     N <- ncol(dif$coefs)
   else
     N <- NCOL(dif)
@@ -46,7 +46,7 @@ compute.u <- function(group1 = NULL, group2 = NULL, dif = NULL, basis, dependent
         sumup <- 0
         for(k in 1:nbas){
           for(m in 1:nbas){
-            if(k < m) sumup <- sumup + fda::eval.basis(bas, t)[, k]*eval.basis(bas, t)[, m]*sigma[k, m]
+            if(k < m) sumup <- sumup + fda::eval.basis(bas, t)[, k] * fda::eval.basis(bas, t)[, m]*sigma[k, m]
           }
         }
         ret <-2*sumup

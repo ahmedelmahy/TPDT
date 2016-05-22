@@ -1,24 +1,19 @@
-#' Simulate data
-#' @description takes a function and other data parameters and creates paired time resolved
-#'  data of two groups.
-#'  @param n number of individuals per group
-#'  @param sd1 In group variance of group one.
-#'  @param sd2 Variance of the "shift", that the second group is shifted away (pairwise) from group 1.
-#'  @param ntimepoints Number of time measurements per individuals
-#'  @param type The type of shift: vertical ("shift"), horizontal ("phaseshift"), or slope ("slopeshift")
-#'  @param f The underlying function of group 1. If not provided, there are default functions involving sin().
-#'  @param f2 deprecated.
-#' @return [data.frame] with simulated data, with certain shift, variances, number of time points etc. 
-#' The id column holdes the pairing information.
-#' @export
-make_data <- function(shift, n, sd1, sd2, ntimepoints, type = c("shift", "phaseshift", "slopeshift"), 
-                      f, f2 = NULL) {
+#' Internal function
+#' takes a function and other parameters
+#' returns simulated data, with certain shift, variance, and if
+#' paired = TRUE also paired data with certain correlation
+make_data <- function(shift, n, sd1, sd2, ntimepoints, n_NA, 
+                      type = c("vertshift", "horshift", 
+                               "slopeshift", "allshift"), 
+		f = NULL, f2 = NULL) {
   
   if(length(shift) > 1) {
     n12 <- as.numeric(shift["n"])
     sd1 <- as.numeric(shift["sd1"])
     sd2 <- as.numeric(shift["sd2"])
     ntimepoints <- as.numeric(shift["ntp"])
+    n_NA <- as.numeric(shift["n_NA"])
+    type <- as.character(shift["type"])
     shift <- as.numeric(shift["shift"])
   } else
     n12 <- n
@@ -31,18 +26,11 @@ make_data <- function(shift, n, sd1, sd2, ntimepoints, type = c("shift", "phases
   if(missing(f))
     f <- NULL
   if(is.null(f)) {
-    if(type == "shift")
-      f <- function(x) .5 * x + sin(x) + 10
-    
-    if(type == "slopeshift")
-      f <- function(x, shift) 2 * (x + shift) * sin(x) + 10
-    
-    if(type == "phaseshift")
       f <- function(x1, x2) 2 * x1 * sin(x2) + 10
   }
   
-  if(missing(ntimepoints))
-    ntimepoints <- 8
+  #if(missing(ntimepoints))
+  #  ntimepoints <- 8
   
   # simulated data
   data <- data.frame(expand.grid(time = seq(0,9, length.out = ntimepoints), ind = 1:n12, grp = 1:2))
@@ -61,14 +49,15 @@ make_data <- function(shift, n, sd1, sd2, ntimepoints, type = c("shift", "phases
     # fill data.frame to return
     data[ , "data"] <- NA
     
-    if(type == "shift") {
-      stopifnot(all(names(formals(f)) %in% "x"))
+    if(type == "vertshift") {
+      stopifnot(all(names(formals(f)) %in% c("x1", "x2")))
       
-      data[data$grp == 1 , "data"] <- f(data[data$grp == 1, "time"]) + as.numeric(epsilon)
+      data[data$grp == 1 , "data"] <- f(x1 = data[data$grp == 1, "time"],
+                                        x2 = data[data$grp == 1, "time"]) + as.numeric(epsilon)
       data[data$grp == 2, "data"] <- data[data$grp == 1, "data"] + shift + 
         rnorm(length(data[data$grp == 1, "data"]), sd = sd2)
       
-    } else if(type == "phaseshift") {
+    } else if(type == "horshift") {
       stopifnot(all(names(formals(f)) %in% c("x1", "x2")))
       
       # here two times same x
@@ -80,16 +69,42 @@ make_data <- function(shift, n, sd1, sd2, ntimepoints, type = c("shift", "phases
         rnorm(length(data[data$grp == 1, "data"]), sd = sd2)
       
     } else if(type == "slopeshift") {
-      stopifnot(all(names(formals(f)) %in% c("x", "shift")))
+      stopifnot(all(names(formals(f)) %in% c("x1", "x2")))
       
-      data[data$grp == 1 , "data"] <- f(data[data$grp == 1, "time"], 0) + as.numeric(epsilon)
-      data[data$grp == 2, "data"] <- f(data[data$grp == 1, "time"], shift) + 
+      data[data$grp == 1 , "data"] <- f(x1 = data[data$grp == 1, "time"],
+                                        x2 = data[data$grp == 1, "time"]) + as.numeric(epsilon)
+      data[data$grp == 2 , "data"] <- f(x1 = data[data$grp == 1, "time"] + shift,
+                                        x2 = data[data$grp == 1, "time"]) + as.numeric(epsilon) +
+       rnorm(length(data[data$grp == 1, "data"]), sd = sd2)
+    } else if(type == "allshift") {
+      stopifnot(all(names(formals(f)) %in% c("x1", "x2")))
+      
+      data[data$grp == 1 , "data"] <- f(x1 = data[data$grp == 1, "time"],
+                                        x2 = data[data$grp == 1, "time"]) + as.numeric(epsilon)
+      data[data$grp == 2 , "data"] <- f(x1 = data[data$grp == 1, "time"] + shift,
+                                        x2 = data[data$grp == 1, "time"] + shift) + 
+        shift + 
+        as.numeric(epsilon) +
         rnorm(length(data[data$grp == 1, "data"]), sd = sd2)
     }
   }
   
   data <- data[, c(2, 1, 3, 4)]
   names(data) <- c("id", "time", "group", "data")
+  
+  if(n_NA != 0) {
+    # insert some NAs
+    for(gr in 1:2) {
+      for(j in unique(data[data$group == gr, "id"])) {
+        rows <- rownames(
+          data[(data$group == gr) & (data$id == j) & (!data$time %in% c(0, 9)), ])
+        siz <- n_NA * ntimepoints
+        NArows <- sample(rows, size = siz)
+        data[NArows, "data"] <- NA
+      }
+    }
+  }
+  
   data
 }
 

@@ -2,7 +2,7 @@
 # TPDT
   
 ## Time resolved paired differences test
-`TPDT` is a R package for a sort of "functional paired t-test". Transforms raw data from two groups (with possible paired individuals) into functional data and performs a procedure generalized from the common t-test to test for a difference between the two groups of funtions.
+`TPDT` is a R package for a sort of "functional paired t-test". Transforms raw data from two groups (with possibly paired individuals) into functional data and performs a procedure generalized from the common t-test to test for a difference between the two groups of funtions.
 
 ## Installation
 
@@ -16,6 +16,7 @@ with `devtools::install_github("erdto/TPDT")`
 After that you load it as usual with `library(TPDT)`
 
 ## Demo
+
 ```r
 library(TPDT)
 
