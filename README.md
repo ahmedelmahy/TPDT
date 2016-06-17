@@ -11,7 +11,7 @@
 2. Until this package is published on CRAN, you can install it from github 
 
 
-with `devtools::install_github("erdto/TPDT")`
+with `devtools::install_github("toreerdmann/TPDT")`
 
 After that you load it as usual with `library(TPDT)`
 
