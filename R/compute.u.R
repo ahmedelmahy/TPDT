@@ -34,49 +34,54 @@ compute.u <- function(group1 = NULL, group2 = NULL, dif = NULL, basis, dependent
     # estimate Sigma from data
     sigma <- cov(t(dif$coefs))
     
+    
+    ## WE DO NOT NEED THIS CHUNK OF CODE ANY MORE - DISCARD IF NO ERRORS OCCUR IN FUTURE!
     # compute scaling constant
-    intexpect <- function(sigma, bas){
-      nbas <- bas$nbasis
-      sum1 <- function(t, bas, sigma){
-        ret <- sum(fda::eval.basis(bas, t)^2*diag(sigma))
-        ret
-      } 
-      
-      sum2 <- function(t, bas, sigma){
-        sumup <- 0
-        for(k in 1:nbas){
-          for(m in 1:nbas){
-            if(k < m) sumup <- sumup + fda::eval.basis(bas, t)[, k] * fda::eval.basis(bas, t)[, m]*sigma[k, m]
-          }
-        }
-        ret <-2*sumup
-        ret
-      }
-      
-      sqrt_to_int <- function(t, bas, sigma){
-        ret <- sqrt(sum1(t, bas, sigma) + sum2(t, bas, sigma))
-        return(ret)
-      }
-      
-      neval <- 100
-      sqrteval <- rep(0, neval)
-      times <- seq(bas$rangeval[1], bas$rangeval[2], length.out = neval)
-      for(i in 1:length(times)){
-        sqrteval[i] <- sqrt_to_int(times[i], bas, sigma)
-      }
-      
-      #   plot(times, sqrteval, ylim = c(0, 0.5))
-      
-      ret <- 0
-      for(i in 2:neval){
-        ret <- ret + 0.5*(times[2] - times[1])*(sqrteval[i] + sqrteval[i-1])
-      }
-      ret
-    }
-    
-    int <- intexpect(sigma, bas = basis)
-    c <- (sint / int)^2
-    
+    # intexpect <- function(sigma, bas){
+    #   nbas <- bas$nbasis
+    #   sum1 <- function(t, bas, sigma){
+    #     ret <- sum(fda::eval.basis(bas, t)^2*diag(sigma))
+    #     ret
+    #   } 
+    #   
+    #   sum2 <- function(t, bas, sigma){
+    #     sumup <- 0
+    #     for(k in 1:nbas){
+    #       for(m in 1:nbas){
+    #         if(k < m) sumup <- sumup + fda::eval.basis(bas, t)[, k] * fda::eval.basis(bas, t)[, m]*sigma[k, m]
+    #       }
+    #     }
+    #     ret <-2*sumup
+    #     ret
+    #   }
+    #   
+    #   sqrt_to_int <- function(t, bas, sigma){
+    #     ret <- sqrt(sum1(t, bas, sigma) + sum2(t, bas, sigma))
+    #     return(ret)
+    #   }
+    #   
+    #   neval <- 100
+    #   sqrteval <- rep(0, neval)
+    #   times <- seq(bas$rangeval[1], bas$rangeval[2], length.out = neval)
+    #   for(i in 1:length(times)){
+    #     sqrteval[i] <- sqrt_to_int(times[i], bas, sigma)
+    #   }
+    #   
+    #   #   plot(times, sqrteval, ylim = c(0, 0.5))
+    #   
+    #   ret <- 0
+    #   for(i in 2:neval){
+    #     ret <- ret + 0.5*(times[2] - times[1])*(sqrteval[i] + sqrteval[i-1])
+    #   }
+    #   ret
+    # }
+    # 
+    # int <- intexpect(sigma, bas = basis)
+    # c <- (sint / int)^2
+    ## END OF NOT NEEDED CODE
+
+    c <- 1
+        
     # scale Sigma
     sigma <- sigma*c
   }

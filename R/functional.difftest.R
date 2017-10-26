@@ -8,6 +8,7 @@ functional.difftest <- function(rawdata = NULL, funcdata = NULL, N = 10, Nsim, B
   
   # determine which kind of data is used
   if(is.null(funcdata)){
+    warning('internal warning: No functional data object provided to functional.difftest! Please only use next code chunk experimentally!')
     if(is.null(rawdata)){
       time <- seq(0, 10, .1)
       y1 <- sin(time) + rnorm(length(time), sd = 0.01)

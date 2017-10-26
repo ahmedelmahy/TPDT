@@ -2,7 +2,7 @@
 # TPDT
   
 ## Time resolved paired differences test
-`TPDT` is a R package for a sort of "functional paired t-test". Transforms raw data from two groups (with possibly paired individuals) into functional data and performs a procedure generalized from the common t-test to test for a difference between the two groups of funtions.
+`TPDT` is an R package suited for the analysis of time-resolved observations. More specifically, we provide a collection of state of the art tools which all have the task of exploring the difference of two groups of functional observations over a specified time interval. Moreover, we provide an additional tool - the TPDT (Time-resolved Paired Differences Test) - which in some situations has a better performance in terms of AUC and power compared to the here implemented competitors (publication to appear soon). 
 
 ## Installation
 
